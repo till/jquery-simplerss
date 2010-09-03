@@ -32,6 +32,59 @@
  * @link     http://github.com/till/jquery-simplerss
  */
 (function($){
+
+    function isCrossDomain(url) {
+        if (url.substring(0, 7) == 'http://') {
+            return true;
+        }
+        if (url.substring(0, 8) == 'https://') {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * My attempt to do cross-domain ajax and pull a feed.
+     *
+     * @param string url The URL of the feed.
+     *
+     * @return string
+     */
+    function remoteAjax(url) {
+        var iframe = jQuery('<iframe>');
+        var feed;
+
+        jQuery(iframe).attr('src', url);
+        jQuery(iframe).css('position', 'absolute');
+        jQuery(iframe).css('left', '-10000px');
+        jQuery(iframe).appendTo('body').load(function(){
+            console.debug(jQuery(iframe).contents());
+        }).remove();
+    }
+
+
+    function parseFeed(feed, template, container, max, wrapper) {
+
+        console.debug(
+            'Template: %s, Max: %d, Wrapper: %s',
+            template, max, wrapper
+        );
+        console.debug(container);
+        console.debug(feed);
+
+        jQuery(feed).find('item').each(function(i){
+            var itemHtml = template.replace(/{title}/, jQuery(this).find('title').text());
+            itemHtml = itemHtml.replace(/{text}/, jQuery(this).find('description').text());
+            itemHtml = itemHtml.replace(/{link}/, jQuery(this).find('guid').text());
+
+            jQuery(container).append(jQuery('<' + wrapper + '>').append(itemHtml));
+
+            if (i == max) {
+                return false;
+            }
+        });
+    }
+
     jQuery.fn.extend({
 
         /**
@@ -51,13 +104,18 @@
                 display: 2
             }
             var options = jQuery.extend(defaults, options);
-  
+
             return this.each(function() { 
                 var o = options;
                 var c = jQuery(this);
 
                 if (o.url == '') {
                     return; // avoid the request
+                }
+
+                if (isCrossDomain(o.url)) {
+                    parseFeed(remoteAjax(o.url), o.html, c, o.display, o.wrapper);
+                    return;
                 }
 
                 jQuery.ajax({
@@ -67,21 +125,8 @@
                     error: function (xhr, status, e) {
                         console.debug('C: #%s, Error: %s, Feed: %s', $(c).attr('id'), e, o.url);
                     },
-                    success: function(feed){
-
-                        jQuery(feed).find('item').each(function(i){
-
-                            var itemHtml = o.html.replace(/{title}/, jQuery(this).find('title').text());
-                            itemHtml = itemHtml.replace(/{text}/, jQuery(this).find('description').text());
-                            itemHtml = itemHtml.replace(/{link}/, jQuery(this).find('guid').text());
-
-                            jQuery(c).append(jQuery('<' + o.wrapper + '>').append(itemHtml));
-
-                            if (i == o.display) {
-                                return false;
-                            }
-
-                        });
+                    success: function(feed) {
+                        parseFeed(feed, o.html, c, o.display, o.wrapper)
                     }
                 });
             });
