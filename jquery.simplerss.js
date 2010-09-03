@@ -33,6 +33,11 @@
  */
 (function($){
 
+    /**
+     * @var array o Local variable with the settings.
+     */
+    var o;
+
     function isCrossDomain(url) {
         if (url.substring(0, 7) == 'http://') {
             return true;
@@ -46,40 +51,40 @@
     /**
      * My attempt to do cross-domain ajax and pull a feed.
      *
-     * @param string url The URL of the feed.
-     *
+     * @param string url       The URL of the feed.
+     * @param obj    container jQuery reference.
      * @return string
      */
-    function remoteAjax(url) {
+    function remoteAjax(url, container) {
         var iframe = jQuery('<iframe>');
-        var feed;
+
+        jQuery(iframe).bind('load', function(){
+            parseFeed(jQuery(iframe).contents(), container); 
+        });
 
         jQuery(iframe).attr('src', url);
         jQuery(iframe).css('position', 'absolute');
         jQuery(iframe).css('left', '-10000px');
-        jQuery(iframe).appendTo('body').load(function(){
-            console.debug(jQuery(iframe).contents());
-        }).remove();
+        jQuery(iframe).appendTo('body');
     }
 
-
-    function parseFeed(feed, template, container, max, wrapper) {
+    function parseFeed(feed, container) {
 
         console.debug(
             'Template: %s, Max: %d, Wrapper: %s',
-            template, max, wrapper
+            o.html, o.display, o.wrapper
         );
         console.debug(container);
         console.debug(feed);
 
         jQuery(feed).find('item').each(function(i){
-            var itemHtml = template.replace(/{title}/, jQuery(this).find('title').text());
+            var itemHtml = o.html.replace(/{title}/, jQuery(this).find('title').text());
             itemHtml = itemHtml.replace(/{text}/, jQuery(this).find('description').text());
             itemHtml = itemHtml.replace(/{link}/, jQuery(this).find('guid').text());
 
-            jQuery(container).append(jQuery('<' + wrapper + '>').append(itemHtml));
+            jQuery(container).append(jQuery('<' + o.wrapper + '>').append(itemHtml));
 
-            if (i == max) {
+            if (i == o.display) {
                 return false;
             }
         });
@@ -103,18 +108,19 @@
                 dataType: 'xml',
                 display: 2
             }
-            var options = jQuery.extend(defaults, options);
+
+            o = jQuery.extend(defaults, options);
+
+            if (o.url == '') {
+                console.error('No url set.');
+                return; // avoid this for all elements
+            }
 
             return this.each(function() { 
-                var o = options;
                 var c = jQuery(this);
 
-                if (o.url == '') {
-                    return; // avoid the request
-                }
-
                 if (isCrossDomain(o.url)) {
-                    parseFeed(remoteAjax(o.url), o.html, c, o.display, o.wrapper);
+                    remoteAjax(o.url, c);
                     return;
                 }
 
@@ -126,7 +132,7 @@
                         console.debug('C: #%s, Error: %s, Feed: %s', $(c).attr('id'), e, o.url);
                     },
                     success: function(feed) {
-                        parseFeed(feed, o.html, c, o.display, o.wrapper)
+                        parseFeed(feed, c)
                     }
                 });
             });
