@@ -1,6 +1,8 @@
 # jquery.simplerss
 
-This is a really simple plugin to parse an RSS feed with jQuery - my first anyway.
+Inspired by [some recent contract work][blog], this is a really simple plugin to parse an RSS feed with jQuery - my first anyway.
+
+[blog]: http://till.klampaeckel.de/blog/archives/109-Tumblr-Display-a-list-of-entries-in-the-sidebar.html
 
 # Usage
 
