@@ -6,7 +6,7 @@ Inspired by [some recent contract work][blog], this is a really simple plugin to
 
 # Usage
 
-Download 0.1.0 from [downloads][dl], include it along with jQuery then:
+Download `0.1.0` from [downloads][dl], include it along with jQuery then:
 
     $('ul.posts').simplerss({url:'/rssfeed'}); // cross-domain is not supported
 
@@ -19,6 +19,8 @@ Available options (and their defaults) are:
     wrapper: 'li',
     dataType: 'xml',
     display: 2
+
+**For bleeding edge, you can also use `jquery.simplerss.js` but it may be broken. So better grab a download.**
 
 That's all.
 
