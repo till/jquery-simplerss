@@ -78,7 +78,7 @@
                             jQuery(c).append(jQuery('<' + o.wrapper + '>').append(itemHtml));
 
                             if (i == o.display) {
-                                return;
+                                return false;
                             }
 
                         });
