@@ -1,0 +1,20 @@
+<html>
+    <head>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+        <script type="text/javascript" src="/jq-rss/jquery.simplerss.js"></script>
+        <style type="text/css">
+        #posts { display:none; }
+        </style>
+    </head>
+    <body>
+        <h1>A demo</h1>
+        <ul id="posts"></ul>
+        <script type="text/javascript">
+        $(document).ready(function(){
+            $('#posts').simplerss({
+                url: 'http://merged.till.klampaeckel.de/rss'
+            }).show();
+        });
+        </script>
+    </body>
+</html>
