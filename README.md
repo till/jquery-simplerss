@@ -6,9 +6,11 @@ Inspired by [some recent contract work][blog], this is a really simple plugin to
 
 # Usage
 
+Download 0.1.0 from [downloads][dl], include it along with jQuery then:
+
     $('ul.posts').simplerss({url:'/rssfeed'}); // cross-domain is not supported
 
-See `demo.html` in `examples` for a working example.
+See `demo.html` in [examples][eg] for a working example.
 
 Available options (and their defaults) are:
 
@@ -19,6 +21,9 @@ Available options (and their defaults) are:
     display: 2
 
 That's all.
+
+[dl]: http://github.com/till/jquery-simplerss/downloads
+[eg]: http://github.com/till/jquery-simplerss/tree/master/examples/
 
 # License
 
